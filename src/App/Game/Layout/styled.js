@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import { FeederLane, LoadPlateButton } from "../Feeder/styled";
+import { LoadPlateButton } from "../Feeder/styled";
+import { PlateImage } from "../MainBelt/Plate/styled";
 import { FeederRack, GameScreen } from "../styled";
 
 export const GameLayout = styled(GameScreen)`
@@ -22,20 +23,13 @@ export const FeederCounter = styled(FeederRack)`
     padding: ${({ theme }) => theme.spacing.beltGap};
     border: 1px solid #aa754d;
     border-radius: ${({ theme }) => theme.radii.beltCenter};
-    background:
-      repeating-linear-gradient(
-        92deg,
-        transparent 0 9px,
-        rgb(219 152 95 / 8%) 10px,
-        transparent 12px 19px
-      ),
-      linear-gradient(155deg, #95603c, #503023);
+    background: linear-gradient(155deg, #95603c, #503023);
     box-shadow:
       inset 0 1px rgb(255 221 174 / 32%),
       0 3px 8px rgb(0 0 0 / 28%);
   }
 
-  & > ${FeederLane} {
+  && > button {
     box-sizing: border-box;
     justify-self: center;
     width: 100%;
@@ -77,10 +71,59 @@ export const FeederCounter = styled(FeederRack)`
       padding: 3px;
     }
 
-    & > ${FeederLane} {
+    && > button {
       max-width: none;
       gap: 0;
       padding: 2px;
+    }
+  }
+
+  @media (min-width: 481px) {
+    && {
+      gap: 8px;
+      padding: 4px;
+    }
+
+    && > button {
+      display: grid;
+      max-width: 7rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(3, minmax(0, 1fr));
+      grid-auto-flow: row;
+      gap: 4px;
+      padding: 5px;
+    }
+
+    && > button > * {
+      display: grid;
+      grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+      place-items: center;
+      min-width: 0;
+      min-height: 0;
+      width: 100%;
+    }
+
+    && > button ${PlateImage} {
+      width: 100%;
+      height: 100%;
+      max-width: 3rem;
+      max-height: 3rem;
+      object-fit: contain;
+    }
+
+    && > button > :first-child {
+      box-shadow: none;
+    }
+
+    && > button > :first-child::after {
+      content: none;
+    }
+
+    && > button > :first-child ${PlateImage} {
+      border-radius: 50%;
+      outline: 2px solid #ffcf76;
+      outline-offset: -2px;
+      background: rgb(255 207 118 / 12%);
     }
   }
 `;

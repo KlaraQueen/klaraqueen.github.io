@@ -42,7 +42,32 @@ export const FirstPlate = styled(PlatePosition)`
     $highlight
       ? "radial-gradient(ellipse at center, rgba(255, 207, 110, 0.65), transparent 75%)"
       : "transparent"};
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}px) {
+    position: relative;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 2px #efbe68;
+
+    &::after {
+      content: "↑";
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      display: grid;
+      place-items: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffcf76;
+      color: #352315;
+      font:
+        800 12px / 1 system-ui,
+        sans-serif;
+      pointer-events: none;
+    }
+  }
 `;
+
 export const LoadPlateButton = styled.button`
   display: grid;
   place-items: center;
