@@ -10,11 +10,15 @@ export const Main = styled.main`
   display: grid;
   grid-template-rows: minmax(0, 1fr);
   width: 100%;
+  height: 100vh;
   height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
   max-width: ${({ theme }) => theme.sizes.gameMaxWidth};
   margin-inline: auto;
   padding: ${({ theme }) => theme.spacing.page};
   text-align: center;
+  overflow: hidden;
 
   &::before {
     content: "";
