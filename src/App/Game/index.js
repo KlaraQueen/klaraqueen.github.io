@@ -4,6 +4,7 @@ import CustomerProgress from "./Customer/Progress";
 import Feeder from "./Feeder";
 import GameHud from "./GameHud";
 import GameOver from "./GameOver";
+import watchAndroidRewardAd from "./GameOver/watchAndroidRewardAd";
 import { FeederCounter, GameLayout } from "./Layout/styled";
 import MainBelt from "./MainBelt";
 import PlateDelivery from "./PlateDelivery";
@@ -14,13 +15,13 @@ import useBestScore from "./useBestScore";
 import useGameAnimationPause from "./useGameAnimationPause";
 import useGameState from "./useGameState";
 import { hammerCost } from "./useGameState/gameReducer";
-import watchAndroidRewardAd from "./GameOver/watchAndroidRewardAd";
 
 const testAdsEnabled = process.env.NODE_ENV === "development";
 
 export default function Game() {
   const gameRef = useRef(null);
   const [hammerRound, setHammerRound] = useState(null);
+  const [rewardAdBusy, setRewardAdBusy] = useState(false);
   const paused = hammerRound !== null;
 
   const {
@@ -46,9 +47,14 @@ export default function Game() {
     restartRound,
   } = useGameState(paused);
 
-  const [rewardAdBusy, setRewardAdBusy] = useState(false);
-
   useGameAnimationPause(gameRef, paused);
+
+  const bestScore = useBestScore(score);
+  const hintedFeederIndex = useTutorial({ belt, deliveries, feeders, orders });
+  const hammerActive =
+    !gameOver && hammerRound === round && coins >= hammerCost;
+  const showFeederHint =
+    !gameOver && loadingQueue.length === 0 && hintedFeederIndex !== -1;
 
   async function handleRewardCoins() {
     if (rewardAdBusy) {
@@ -69,11 +75,6 @@ export default function Game() {
       setRewardAdBusy(false);
     }
   }
-
-  const bestScore = useBestScore(score);
-  const hintedFeederIndex = useTutorial({ belt, deliveries, feeders, orders });
-  const hammerActive =
-    !gameOver && hammerRound === round && coins >= hammerCost;
 
   function toggleHammer() {
     setHammerRound(hammerActive ? null : round);
@@ -118,6 +119,7 @@ export default function Game() {
         round,
         coins,
         bestScore,
+        runCoins: score,
         hammerActive,
         onHammerToggle: toggleHammer,
         onRewardCoins: handleRewardCoins,
@@ -146,10 +148,7 @@ export default function Game() {
       ),
       createElement(
         Tutorial,
-        {
-          showHint:
-            !gameOver && loadingQueue.length === 0 && hintedFeederIndex !== -1,
-        },
+        { showHint: showFeederHint },
         createElement(CustomerProgress, { servedCustomers, totalCustomers }),
       ),
       createElement(
@@ -160,9 +159,7 @@ export default function Game() {
             key: feederIndex,
             sushiTypes,
             showTutorialHint:
-              !gameOver &&
-              loadingQueue.length === 0 &&
-              feederIndex === hintedFeederIndex,
+              showFeederHint && feederIndex === hintedFeederIndex,
             onLoad: () => loadFromFeeder(feederIndex),
           }),
         ),

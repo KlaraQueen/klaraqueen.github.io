@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { CustomerImage } from "./Customer/styled";
-import { FeederLane, LoadPlateButton } from "./Feeder/styled";
+import { FeederLane, LoadPlateButton, PlatePosition } from "./Feeder/styled";
 import { Belt, BeltSlot } from "./MainBelt/styled";
 import { PlateImage } from "./MainBelt/Plate/styled";
 
@@ -44,6 +44,14 @@ export const FeederRack = styled.div`
     height: 100%;
     min-height: 0;
     object-fit: contain;
+  }
+
+  @media (max-width: 480px) {
+    & ${PlatePosition} {
+      min-height: 0;
+      align-self: stretch;
+      grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    }
   }
 `;
 
@@ -105,5 +113,23 @@ export const CustomerBoard = styled.div`
     grid-area: bottomLeft;
     align-self: end;
     justify-self: end;
+  }
+
+  @media (max-width: 480px) {
+    column-gap: 0;
+
+    & > ${Belt} {
+      width: min(72cqw, 100cqh, ${({ theme }) => theme.sizes.beltMaxWidth});
+    }
+
+    & > [data-customer-slot] {
+      width: 100%;
+    }
+
+    & ${CustomerImage} {
+      width: 160%;
+      height: min(36cqh, 105px);
+      min-height: 0;
+    }
   }
 `;

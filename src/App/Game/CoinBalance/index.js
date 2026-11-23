@@ -1,16 +1,31 @@
 import { createElement } from "react";
-import BestScore from "./BestScore";
-import { Balance, CurrentCoins } from "./styled";
+import { Balance, CurrentCoins, Stat, StatLabel, StatValue } from "./styled";
 
-export default function CoinBalance({ coins, bestScore }) {
+export default function CoinBalance({ coins, bestScore, runCoins = 0 }) {
   return createElement(
     Balance,
-    null,
+    { "aria-label": "Game statistics" },
     createElement(
-      CurrentCoins,
-      { role: "status", "data-coin-target": true },
-      `🪙 ${coins}`,
+      Stat,
+      null,
+      createElement(StatLabel, null, "Run coins"),
+      createElement(StatValue, null, runCoins),
     ),
-    createElement(BestScore, { score: bestScore }),
+    createElement(
+      Stat,
+      null,
+      createElement(StatLabel, null, "Wallet"),
+      createElement(
+        CurrentCoins,
+        { role: "status", "data-coin-target": true },
+        coins,
+      ),
+    ),
+    createElement(
+      Stat,
+      { $record: true },
+      createElement(StatLabel, null, "Best score"),
+      createElement(StatValue, null, bestScore),
+    ),
   );
 }

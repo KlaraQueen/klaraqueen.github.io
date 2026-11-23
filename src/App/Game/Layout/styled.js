@@ -6,6 +6,13 @@ export const GameLayout = styled(GameScreen)`
   && {
     grid-template-rows: auto minmax(0, 2fr) auto minmax(0, 1fr);
   }
+
+  @media (max-width: 480px) {
+    && {
+      grid-template-rows: auto minmax(0, 1.65fr) auto minmax(0, 1fr);
+      gap: 5px;
+    }
+  }
 `;
 
 export const FeederCounter = styled(FeederRack)`
@@ -62,5 +69,18 @@ export const FeederCounter = styled(FeederRack)`
       rgb(255 171 54 / 25%) 46%,
       transparent 72%
     );
+  }
+
+  @media (max-width: 480px) {
+    && {
+      gap: 5px;
+      padding: 3px;
+    }
+
+    & > ${FeederLane} {
+      max-width: none;
+      gap: 0;
+      padding: 2px;
+    }
   }
 `;

@@ -55,6 +55,14 @@ export default function advanceBelt(state, elapsedMs, now, loadingSlot = 15) {
     belt[loadingSlot] = loadingQueue.shift();
   }
 
+  const beltIsFull = belt.every((plate) => plate !== null);
+  const deliveryInProgress = deliveries.length > 0;
+  const customerChangeInProgress = orders.some(({ departing }) => departing);
+  const matchingSushiOnBelt = orders.some(
+    ({ type, quantity, incoming = 0, departing }) =>
+      !departing && quantity > incoming && belt.includes(type),
+  );
+
   return {
     ...state,
     belt,
@@ -64,6 +72,10 @@ export default function advanceBelt(state, elapsedMs, now, loadingSlot = 15) {
     availablePortraits,
     deliveries,
     loadingQueue,
-    gameOver: belt.every((plate) => plate !== null),
+    gameOver:
+      beltIsFull &&
+      !deliveryInProgress &&
+      !customerChangeInProgress &&
+      !matchingSushiOnBelt,
   };
 }
