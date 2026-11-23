@@ -1,28 +1,26 @@
 import { createElement } from "react";
 import Plate from "../MainBelt/Plate";
-import { TutorialPlateButton } from "../Tutorial/styled";
-import { FeederLane, LoadPlateButton } from "./styled";
+import { FeederLane, FirstPlate, PlatePosition } from "./styled";
 
 const visiblePlateLimit = 6;
 
 export default function Feeder({ sushiTypes, onLoad, showTutorialHint }) {
-  const [firstSushi, ...waitingSushi] = sushiTypes.slice(0, visiblePlateLimit);
-  const FirstPlateButton = showTutorialHint
-    ? TutorialPlateButton
-    : LoadPlateButton;
+  const visibleSushi = sushiTypes.slice(0, visiblePlateLimit);
 
   return createElement(
     FeederLane,
-    null,
-    firstSushi
-      ? createElement(
-          FirstPlateButton,
-          { type: "button", onClick: onLoad },
-          createElement(Plate, { type: firstSushi }),
-        )
-      : null,
-    waitingSushi.map((type, index) =>
-      createElement(Plate, { key: index, type }),
+    {
+      type: "button",
+      onClick: onLoad,
+      disabled: visibleSushi.length === 0,
+      "aria-label": "Send next sushi from this feeder",
+    },
+    visibleSushi.map((type, index) =>
+      createElement(
+        index === 0 ? FirstPlate : PlatePosition,
+        { key: index, $highlight: index === 0 && showTutorialHint },
+        createElement(Plate, { type }),
+      ),
     ),
   );
 }
