@@ -29,6 +29,7 @@ export default function Game() {
     score,
     belt,
     beltStep,
+    loadingQueue = [],
     moveIntervalMs,
     orders,
     feeders,
@@ -127,6 +128,7 @@ export default function Game() {
         createElement(MainBelt, {
           sushiBySlot: belt,
           beltStep,
+          loadingQueue,
           moveIntervalMs,
           hammerActive,
           onHammerSlotSelect: selectHammerSlot,
@@ -144,7 +146,10 @@ export default function Game() {
       ),
       createElement(
         Tutorial,
-        { showHint: !gameOver && hintedFeederIndex !== -1 },
+        {
+          showHint:
+            !gameOver && loadingQueue.length === 0 && hintedFeederIndex !== -1,
+        },
         createElement(CustomerProgress, { servedCustomers, totalCustomers }),
       ),
       createElement(
@@ -154,7 +159,10 @@ export default function Game() {
           createElement(Feeder, {
             key: feederIndex,
             sushiTypes,
-            showTutorialHint: !gameOver && feederIndex === hintedFeederIndex,
+            showTutorialHint:
+              !gameOver &&
+              loadingQueue.length === 0 &&
+              feederIndex === hintedFeederIndex,
             onLoad: () => loadFromFeeder(feederIndex),
           }),
         ),

@@ -34,3 +34,30 @@ export const BeltSlot = styled.div`
     transform: translate(20%, -20%);
   }
 `;
+
+export const LoadingQueue = styled.div`
+  grid-row: 7;
+  grid-column: 4 / span 3;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  justify-self: center;
+  width: 82%;
+  gap: 8%;
+`;
+
+export const LoadingTray = styled.span`
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1.25;
+  box-sizing: border-box;
+  border: 2px solid ${({ $occupied }) => ($occupied ? "#f8ce8a" : "#ba8351")};
+  border-radius: 28%;
+  background: ${({ $occupied }) => ($occupied ? "#7a4a2b" : "#39251d")};
+  box-shadow:
+    inset 0 2px 5px #1b100b99,
+    0 2px 3px #20140e80;
+`;

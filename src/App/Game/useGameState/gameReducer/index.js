@@ -6,11 +6,17 @@ import returnPlatesToFeeders from "../returnPlatesToFeeders";
 export const hammerCost = 100;
 
 const loadingSlot = 15;
+const loadingQueueCapacity = 2;
+
+const initialLoadingState = {
+  loadingQueue: [],
+};
 
 export default function gameReducer(state, action) {
   if (action.type === "restart") {
     return {
       ...action.initialState,
+      ...initialLoadingState,
       coins: state.coins,
       score: 0,
     };
@@ -37,31 +43,28 @@ export default function gameReducer(state, action) {
 
   switch (action.type) {
     case "move":
-      return advanceBelt(state, action.elapsedMs, action.now);
+      return advanceBelt(state, action.elapsedMs, action.now, loadingSlot);
 
     case "deliveryArrived":
       return completeDelivery(state, action.deliveryId, action.now);
 
     case "load": {
       const { feederIndex } = action;
-      const queue = state.feeders[feederIndex];
+      const feederQueue = state.feeders[feederIndex];
+      const loadingQueue = state.loadingQueue ?? [];
 
-      if (!queue?.length || state.belt[loadingSlot] !== null) {
+      if (!feederQueue?.length || loadingQueue.length >= loadingQueueCapacity) {
         return state;
       }
 
-      const [firstSushi, ...remainingSushi] = queue;
-      const belt = [...state.belt];
+      const [firstSushi, ...remainingSushi] = feederQueue;
       const feeders = [...state.feeders];
-
-      belt[loadingSlot] = firstSushi;
       feeders[feederIndex] = remainingSushi;
 
       return {
         ...state,
-        belt,
         feeders,
-        gameOver: belt.every((plate) => plate !== null),
+        loadingQueue: [...loadingQueue, firstSushi],
       };
     }
 
@@ -86,6 +89,7 @@ export default function gameReducer(state, action) {
 
       return {
         ...action.initialState,
+        ...initialLoadingState,
         coins: state.coins,
         score: state.score,
       };

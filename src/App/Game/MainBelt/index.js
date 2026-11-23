@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import Plate from "./Plate";
-import { Belt, BeltSlot } from "./styled";
+import { Belt, BeltSlot, LoadingQueue, LoadingTray } from "./styled";
 import usePlateAnimation from "./usePlateAnimation";
 
 const beltSlots = [
@@ -39,6 +39,7 @@ const selectableSlotStyle = {
 
 export default function MainBelt({
   sushiBySlot,
+  loadingQueue = [],
   beltStep,
   moveIntervalMs,
   hammerActive,
@@ -73,5 +74,21 @@ export default function MainBelt({
         sushiType ? createElement(Plate, { type: sushiType }) : null,
       );
     }),
+    createElement(
+      LoadingQueue,
+      {
+        role: "group",
+        "aria-label": `Waiting sushi: ${loadingQueue.length} of 2`,
+      },
+      [0, 1].map((index) => {
+        const sushiType = loadingQueue[index];
+
+        return createElement(
+          LoadingTray,
+          { key: index, $occupied: Boolean(sushiType) },
+          sushiType ? createElement(Plate, { type: sushiType }) : null,
+        );
+      }),
+    ),
   );
 }
