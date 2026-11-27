@@ -1,4 +1,11 @@
-import { createElement, Fragment, useRef, useState } from "react";
+import {
+  createElement,
+  Fragment,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { Capacitor } from "@capacitor/core";
 import Customer from "./Customer";
 import CustomerProgress from "./Customer/Progress";
 import Feeder from "./Feeder";
@@ -10,19 +17,32 @@ import MainBelt from "./MainBelt";
 import PlateDelivery from "./PlateDelivery";
 import Tutorial from "./Tutorial";
 import useTutorial from "./Tutorial/useTutorial";
-import { CustomerBoard } from "./styled";
+import {
+  CustomerBoard,
+  PauseDialog,
+  PauseMenuButton,
+  PauseMenuTitle,
+} from "./styled";
 import useBestScore from "./useBestScore";
 import useGameAnimationPause from "./useGameAnimationPause";
 import useGameState from "./useGameState";
 import { hammerCost } from "./useGameState/gameReducer";
 
 const testAdsEnabled = process.env.NODE_ENV === "development";
+const bonusCoins = 100;
 
 export default function Game() {
   const gameRef = useRef(null);
+  const pauseDialogRef = useRef(null);
+  const rewardAdInProgress = useRef(false);
+
   const [hammerRound, setHammerRound] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmMenuRestart, setConfirmMenuRestart] = useState(false);
   const [rewardAdBusy, setRewardAdBusy] = useState(false);
-  const paused = hammerRound !== null;
+  const [rewardAdMessage, setRewardAdMessage] = useState("");
+
+  const paused = hammerRound !== null || menuOpen;
 
   const {
     round,
@@ -49,6 +69,18 @@ export default function Game() {
 
   useGameAnimationPause(gameRef, paused);
 
+  useLayoutEffect(() => {
+    const dialog = pauseDialogRef.current;
+
+    if (menuOpen && !dialog.open) {
+      dialog.showModal();
+    }
+
+    if (!menuOpen && dialog.open) {
+      dialog.close();
+    }
+  }, [menuOpen]);
+
   const bestScore = useBestScore(score);
   const hintedFeederIndex = useTutorial({ belt, deliveries, feeders, orders });
   const hammerActive =
@@ -57,23 +89,49 @@ export default function Game() {
     !gameOver && loadingQueue.length === 0 && hintedFeederIndex !== -1;
 
   async function handleRewardCoins() {
-    if (rewardAdBusy) {
+    if (rewardAdInProgress.current) {
       return;
     }
 
+    if (Capacitor.getPlatform() !== "android") {
+      setRewardAdMessage("Video rewards are available in the Android app.");
+      return;
+    }
+
+    rewardAdInProgress.current = true;
     setRewardAdBusy(true);
+    setRewardAdMessage("Loading ad…");
 
     try {
       const earnedReward = await watchAndroidRewardAd();
 
       if (earnedReward) {
-        rewardCoins(100);
+        rewardCoins(bonusCoins);
+        setRewardAdMessage(`+${bonusCoins} coins added to your wallet.`);
+      } else {
+        setRewardAdMessage("Ad closed before the reward.");
       }
     } catch (error) {
       console.error("Rewarded coin boost failed:", error);
+
+      const code = error?.code;
+      setRewardAdMessage(
+        code == null ? "Ad unavailable." : `Ad unavailable (code ${code}).`,
+      );
     } finally {
+      rewardAdInProgress.current = false;
       setRewardAdBusy(false);
     }
+  }
+
+  function openPauseMenu() {
+    setConfirmMenuRestart(false);
+    setMenuOpen(true);
+  }
+
+  function closePauseMenu() {
+    setConfirmMenuRestart(false);
+    setMenuOpen(false);
   }
 
   function toggleHammer() {
@@ -100,7 +158,9 @@ export default function Game() {
   }
 
   function handleRestart() {
+    closePauseMenu();
     setHammerRound(null);
+    setRewardAdMessage("");
     restartRound();
   }
 
@@ -123,6 +183,10 @@ export default function Game() {
         hammerActive,
         onHammerToggle: toggleHammer,
         onRewardCoins: handleRewardCoins,
+        rewardAdBusy,
+        rewardAdMessage,
+        onOpenMenu: openPauseMenu,
+        menuOpen,
       }),
       createElement(
         CustomerBoard,
@@ -181,6 +245,43 @@ export default function Game() {
                 onArrive: finishDelivery,
               }),
           ),
+    ),
+    createElement(
+      PauseDialog,
+      {
+        id: "game-pause-menu",
+        ref: pauseDialogRef,
+        "aria-labelledby": "game-pause-title",
+        onCancel: (event) => {
+          event.preventDefault();
+          closePauseMenu();
+        },
+      },
+      createElement(
+        PauseMenuTitle,
+        { id: "game-pause-title" },
+        confirmMenuRestart ? "Start a new game?" : "Game paused",
+      ),
+      createElement(
+        PauseMenuButton,
+        {
+          type: "button",
+          onClick: confirmMenuRestart
+            ? () => setConfirmMenuRestart(false)
+            : closePauseMenu,
+        },
+        confirmMenuRestart ? "Back" : "Continue",
+      ),
+      createElement(
+        PauseMenuButton,
+        {
+          type: "button",
+          onClick: confirmMenuRestart
+            ? handleRestart
+            : () => setConfirmMenuRestart(true),
+        },
+        confirmMenuRestart ? "Start new game" : "Play again",
+      ),
     ),
     gameOver
       ? createElement(GameOver, {

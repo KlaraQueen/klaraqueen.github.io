@@ -4,5 +4,5 @@
     <string name="title_activity_main">Sushi Conveyor</string>
     <string name="package_name">com.sushiconveyor.game</string>
     <string name="custom_url_scheme">com.sushiconveyor.game</string>
-    <string name="admob_app_id">ca-app-pub-4015948856765595~7828016877</string>
+    <string name="admob_app_id">ca-app-pub-4015948858765595~7828016877</string>
 </resources>

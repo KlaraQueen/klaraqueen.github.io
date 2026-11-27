@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { CustomerImage } from "./Customer/styled";
 import { FeederLane, LoadPlateButton, PlatePosition } from "./Feeder/styled";
 import { Belt, BeltSlot } from "./MainBelt/styled";
@@ -131,5 +131,76 @@ export const CustomerBoard = styled.div`
       height: min(36cqh, 105px);
       min-height: 0;
     }
+  }
+`;
+
+const pauseAppear = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
+
+export const PauseDialog = styled.dialog`
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  width: min(18rem, calc(100% - 2rem));
+  height: fit-content;
+  max-height: calc(100% - 2rem);
+  margin: auto;
+  padding: 1rem;
+  overflow: auto;
+  border: 1px solid ${({ theme }) => theme.colors.accent};
+  border-radius: 16px;
+  background: #25150e;
+  color: ${({ theme }) => theme.colors.text};
+  box-shadow: 0 8px 28px rgb(0 0 0 / 45%);
+
+  &[open] {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  &::backdrop {
+    background: rgb(0 0 0 / 55%);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    &[open] {
+      animation: ${pauseAppear} 140ms ease-out both;
+    }
+  }
+`;
+
+export const PauseMenuTitle = styled.h2`
+  margin: 0 0 0.35rem;
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  text-align: center;
+`;
+
+export const PauseMenuButton = styled.button`
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid ${({ theme }) => theme.colors.accent};
+  border-radius: 9px;
+  background: ${({ theme }) => theme.colors.beltSlot};
+  color: ${({ theme }) => theme.colors.text};
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.text};
+    outline-offset: 2px;
   }
 `;

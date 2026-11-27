@@ -46,6 +46,11 @@ export const HudTopRow = styled.div`
     min-height: 44px;
     padding-inline: 5px;
   }
+
+  @media (max-width: 360px) {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
 `;
 
 export const HudTitle = styled.h1`
@@ -56,6 +61,11 @@ export const HudTitle = styled.h1`
   font-size: clamp(0.8rem, 3.6vw, 1.45rem);
   line-height: 1.1;
   overflow-wrap: break-word;
+
+  @media (max-width: 360px) {
+    flex: 0 0 100%;
+    text-align: center;
+  }
 `;
 
 export const BonusBoostButton = styled.button`
@@ -73,8 +83,51 @@ export const BonusBoostButton = styled.button`
   white-space: nowrap;
   cursor: pointer;
 
+  &:disabled {
+    opacity: 0.65;
+    cursor: wait;
+  }
+
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.colors.text};
     outline-offset: 2px;
+  }
+`;
+
+export const MenuButton = styled.button`
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid ${({ theme }) => theme.colors.accent};
+  border-radius: ${({ theme }) => theme.radii.beltCenter};
+  background: ${({ theme }) => theme.colors.beltSlot};
+  color: ${({ theme }) => theme.colors.text};
+  font: inherit;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.text};
+    outline-offset: 2px;
+  }
+`;
+
+export const RewardAdStatus = styled.p`
+  margin: 0;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 1.25;
+  color: ${({ theme }) => theme.colors.text};
+
+  &:empty {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
   }
 `;
